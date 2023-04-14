@@ -4,12 +4,16 @@
     <!-- Двусторонние связвывание с помощью v-model -->
     <input v-model="post.title" class="input" type="text" placeholder="Название" />
     <input v-model="post.body" class="input" type="text" placeholder="Описание" />
-    <button @click="createPost" class="btn">Добавить пост</button>
+    <my-button @click="createPost" class="btn">Добавить пост</my-button>
   </form>
 </template>
 
 <script>
+import MyButton from './UI/MyButton.vue'
 export default {
+  components: {
+    MyButton
+  },
   data() {
     return {
       post: {
@@ -39,15 +43,10 @@ form {
   flex-direction: column;
   margin-bottom: 20px;
 }
-
 .input {
   width: 100%;
   border: 1px solid blueviolet;
   padding: 10px 15px;
-  margin-top: 15px;
-}
-.btn {
-  align-self: flex-end;
-  margin-top: 15px;
+  margin-bottom: 15px;
 }
 </style>

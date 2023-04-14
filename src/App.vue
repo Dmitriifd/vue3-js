@@ -13,6 +13,7 @@ import PostForm from './components/PostForm.vue';
 import PostList from './components/PostList.vue';
 
 export default {
+  // Регистрация компонентов
   components: {
     PostForm,
     PostList
