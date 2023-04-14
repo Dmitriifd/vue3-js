@@ -4,7 +4,7 @@
     <!-- Двусторонние связвывание с помощью v-model -->
     <input v-model="post.title" class="input" type="text" placeholder="Название" />
     <input v-model="post.body" class="input" type="text" placeholder="Описание" />
-    <button class="btn">Добавить пост</button>
+    <button @click="createPost" class="btn">Добавить пост</button>
   </form>
 </template>
 
@@ -18,6 +18,18 @@ export default {
       }
     };
   },
+  methods: {
+    createPost() {
+      this.post.id = Date.now();
+      // emit - Принимает первым параметром название события
+      // Вторым и последущими параметрами, передаются аргументы которые будут поподать в соответсвующию функцию, после того как на нее подпишится родительский компонент
+      this.$emit('create', this.post);
+      this.post = {
+        title: '',
+        body: ''
+      };
+    }
+  }
 };
 </script>
 
