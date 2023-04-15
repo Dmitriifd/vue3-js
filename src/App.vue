@@ -1,7 +1,6 @@
 <template>
   <div class="app">
     <h1>Страница с постами</h1>
-    <my-button @click="fetchPosts">Получить посты</my-button>
     <my-button @click="showDialog">Создать пост</my-button>
     <my-dialog v-model:show="dialogVisible">
       <post-form @create="createPost" />
@@ -9,7 +8,8 @@
     <!-- Передача пропсов -->
     <!-- <post-list v-bind:posts="posts"/> -->
     <!-- короткая запись -->
-    <post-list :posts="posts" @remove="removePost" />
+    <post-list :posts="posts" @remove="removePost" v-if="!isPostLoading" />
+    <div v-else>Loading...</div>
   </div>
 </template>
 
@@ -29,7 +29,7 @@ export default {
     return {
       posts: [],
       dialogVisible: false,
-      modificatorValue: ''
+      isPostLoading: false
     };
   },
   methods: {
@@ -45,12 +45,20 @@ export default {
     },
     async fetchPosts() {
       try {
-        const response = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10')
-        this.posts = response.data
+        this.isPostLoading = true;
+        setTimeout(async () => {
+          const response = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10');
+          this.posts = response.data;
+           this.isPostLoading = false;
+        }, 1000);
       } catch (e) {
-        alert('Error')
+        alert('Error');
+      } finally {
       }
     }
+  },
+  mounted() {
+    this.fetchPosts();
   }
 };
 </script>
