@@ -21,6 +21,11 @@
         <div class="line"></div>
       </div>
     </div>
+    <div class="page__wrapper">
+      <div class="page" v-for="pageNumber in totalPages" :key="pageNumber" :class="{
+        'current-page': page === pageNumber
+      }" @click="changePage(pageNumber)">{{ pageNumber }}</div>
+    </div>
   </div>
 </template>
 
@@ -43,6 +48,9 @@ export default {
       isPostLoading: false,
       selectedSort: '',
       searchQuery: '',
+      page: 1,
+      limit: 10,
+      totalPages: 0,
       sortOptions: [
         { value: 'title', name: 'По названию' },
         { value: 'body', name: 'По содержанию' }
@@ -60,11 +68,21 @@ export default {
     showDialog() {
       this.dialogVisible = true;
     },
+    changePage(pageNumber) {
+      this.page = pageNumber;
+      this.fetchPosts()
+    },
     async fetchPosts() {
       try {
         this.isPostLoading = true;
         setTimeout(async () => {
-          const response = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10');
+          const response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
+            params: {
+              _page: this.page,
+              _limit: this.limit,
+            }
+          });
+          this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit)
           this.posts = response.data;
           this.isPostLoading = false;
         }, 1000);
@@ -106,7 +124,7 @@ export default {
 .load-wrapp {
   margin: 0 auto;
   width: 100px;
-  height: 100px;
+  height: 70vh;
   padding: 20px 20px 20px;
   border-radius: 5px;
 }
@@ -125,6 +143,23 @@ export default {
 }
 .load-3 .line:nth-last-child(3) {
   animation: loadingC 0.6s 0.3s linear infinite;
+}
+.page__wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 25px;
+}
+.page {
+    border-radius: 8px;
+    padding: 0.6em 1.2em;
+    font-size: 1rem;
+    font-weight: 500;
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+.current-page {
+  border: 1px solid blueviolet;
 }
 @keyframes loadingC {
   0% {
