@@ -2,7 +2,7 @@
   <form @submit.prevent>
     <h2>Название поста</h2>
     <!-- Двусторонние связвывание с помощью v-model -->
-    <my-input v-model="post.title" type="text" placeholder="Название" />
+    <my-input v-model="post.title" v-model:value="post.title" type="text" placeholder="Название" />
     <my-input v-model="post.body" type="text" placeholder="Описание" />
     <my-button @click="createPost" class="btn">Добавить пост</my-button>
   </form>
