@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <h1>Страница с постами</h1>
-    <my-input v-model="searchQuery" placeholder="Поиск..."/>
+    <my-input v-model="searchQuery" placeholder="Поиск..." />
     <div class="app__btns">
       <my-button @click="showDialog">Создать пост</my-button>
       <my-select v-model="selectedSort" :options="sortOptions" />
@@ -14,18 +14,19 @@
     <!-- короткая запись -->
     <post-list :posts="sortedAndSearchedPosts" @remove="removePost" v-if="!isPostLoading" />
     <!-- <div v-else>Loading...</div> -->
-     <div class="load-wrapp" v-else>
+    <div class="load-wrapp" v-else>
       <div class="load-3">
         <div class="line"></div>
         <div class="line"></div>
         <div class="line"></div>
       </div>
     </div>
-    <div class="page__wrapper">
+    <div class="observer" ref="observer"></div>
+    <!-- <div class="page__wrapper">
       <div class="page" v-for="pageNumber in totalPages" :key="pageNumber" :class="{
         'current-page': page === pageNumber
       }" @click="changePage(pageNumber)">{{ pageNumber }}</div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -68,9 +69,9 @@ export default {
     showDialog() {
       this.dialogVisible = true;
     },
-    changePage(pageNumber) {
-      this.page = pageNumber;
-    },
+    // changePage(pageNumber) {
+    //   this.page = pageNumber;
+    // },
     async fetchPosts() {
       try {
         this.isPostLoading = true;
@@ -78,10 +79,10 @@ export default {
           const response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
             params: {
               _page: this.page,
-              _limit: this.limit,
+              _limit: this.limit
             }
           });
-          this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit)
+          this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit);
           this.posts = response.data;
           this.isPostLoading = false;
         }, 1000);
@@ -89,10 +90,38 @@ export default {
         alert('Error');
       } finally {
       }
+    },
+    async loadMorePosts() {
+      try {
+        this.page += 1
+        setTimeout(async () => {
+          const response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
+            params: {
+              _page: this.page,
+              _limit: this.limit
+            }
+          });
+          this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit);
+          this.posts = [...this.posts, ...response.data];
+        }, 1000);
+      } catch (e) {
+        alert('Error');
+      }
     }
   },
   mounted() {
     this.fetchPosts();
+    const options = {
+      rootMargin: '0px',
+      threshold: 1.0
+    };
+    const callback = (entries, observer) => {
+      if (entries[0].isIntersecting && this.page < this.totalPages) {
+        this.loadMorePosts()
+      }
+    }
+    const observer = new IntersectionObserver(callback, options);
+    observer.observe(this.$refs.observer)
   },
   computed: {
     sortedPosts() {
@@ -101,13 +130,15 @@ export default {
       });
     },
     sortedAndSearchedPosts() {
-      return this.sortedPosts.filter((post) => post.title.toLowerCase().includes(this.searchQuery.toLowerCase()))
+      return this.sortedPosts.filter((post) =>
+        post.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
     }
   },
   watch: {
-    page() {
-      this.fetchPosts()
-    }
+    // page() {
+    //   this.fetchPosts()
+    // }
   }
 };
 </script>
@@ -127,7 +158,7 @@ export default {
 .load-wrapp {
   margin: 0 auto;
   width: 100px;
-  height: 70vh;
+  height: 80vh;
   padding: 20px 20px 20px;
   border-radius: 5px;
 }
@@ -154,15 +185,19 @@ export default {
   margin-top: 25px;
 }
 .page {
-    border-radius: 8px;
-    padding: 0.6em 1.2em;
-    font-size: 1rem;
-    font-weight: 500;
-    background-color: #f9f9f9;
-    cursor: pointer;
+  border-radius: 8px;
+  padding: 0.6em 1.2em;
+  font-size: 1rem;
+  font-weight: 500;
+  background-color: #f9f9f9;
+  cursor: pointer;
 }
 .current-page {
   border: 1px solid blueviolet;
+}
+.observer {
+  height: 30px;
+  background-color: red;
 }
 @keyframes loadingC {
   0% {
