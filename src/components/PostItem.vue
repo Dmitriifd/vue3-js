@@ -6,6 +6,7 @@
       <div><strong>Описание:</strong> {{ post.body }}</div>
     </div>
     <div class="post__btns">
+      <my-button @click="$router.push(`/posts/${post.id}`)">Открыть</my-button>
       <my-button @click="$emit('remove', post)">Удалить</my-button>
     </div>
   </div>
@@ -32,5 +33,11 @@ export default {
 }
 .post:not(:last-child) {
   margin-bottom: 15px;
+}
+.post__btns {
+  padding-left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 </style>
